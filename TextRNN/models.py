@@ -40,6 +40,7 @@ class TextRNN(torch.nn.Module):
         else:
             self.s_gru=torch.nn.GRU(self.embed_dim,self.hidden_dim,dropout=self.droup_out_prob) #单向GRU！
             self.s_out = torch.nn.Linear(self.hidden_dim, self.class_nums)
+        #
         self.softmax=torch.nn.LogSoftmax()
 
     def forward(self,seq_input,hidden=None):
