@@ -6,7 +6,7 @@ email：DakeXqq@126.com
 date：2018
 introduction:
             data_helper for TextCNN in pytorch!
-            No minibatch!
+            Minibatch support!
 ===============================================================
 """
 import torch

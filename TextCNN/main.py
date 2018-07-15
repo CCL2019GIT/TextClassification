@@ -5,6 +5,7 @@ author：XieDake
 email：DakeXqq@126.com
 date：2018
 introduction:
+            Main process for training textCNN!
 ===============================================================
 """
 import torch

@@ -5,13 +5,12 @@ author：XieDake
 email：DakeXqq@126.com
 date：2018
 introduction:
+            Load saved model and predict!
 ===============================================================
 """
 import torch
 import argparse,os,pickle
-from model import Poetry_LM
-from data_helper import parseRawData,word2Id_id2Word,sent2Id
-from train import inference
+
 
 def parse_arguments():
     parse = argparse.ArgumentParser(description='Hyperparams of this project!')
@@ -37,17 +36,13 @@ source_file_name=os.path.join(args.Base_path,"chinese-poetry/json/")
 w2Id_save_fileName=os.path.join(args.Save_path,'w2Id')
 i2Wd_save_fileName=os.path.join(args.Save_path,'id2Wd')
 
-model_save_fileName=os.path.join(args.Save_path,'Poetry_LM.pt')
+model_save_fileName=os.path.join(args.Save_path,'TextCNN.pt')
 
 with open(w2Id_save_fileName, "rb") as fr:
     w2Id = pickle.load(fr)
 with open(i2Wd_save_fileName, "rb") as fr:
     i2Wd = pickle.load(fr)
 print("===============================================================")
-data_filter=parseRawData(source_fileName=source_file_name)
-vocab_size=word2Id_id2Word(data_filter=data_filter,
-                            w2Id_save_fileName=w2Id_save_fileName,
-                            i2Wd_save_fileName=i2Wd_save_fileName)
 # print("=============================定义Model网络===============================")
 # print("Models initializing....")
 # model=Poetry_LM(vocab_size=vocab_size,
