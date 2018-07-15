@@ -14,6 +14,8 @@ import pickle,random
 import numpy as np
 from torch.autograd import Variable
 
+PAD_token=0
+
 def load_data(source_data_fileName):
     '''
     loading data!
@@ -26,6 +28,7 @@ def load_data(source_data_fileName):
     return:[[label1,sent1],[label2,sent2]...]
     '''
     data=[]
+    max_seq_length=0
     with open(source_data_fileName,'r',encoding='UTF-8')as r:
         lines=r.readlines()
         print("data size:{}".format({len(lines)}))
@@ -36,13 +39,16 @@ def load_data(source_data_fileName):
                 continue
             else:
                 #
-                sent=[]
-                sent.append(lsp[0])
-                sent.append(lsp[1])
+                sent_label=[]
+                sent_label.append(lsp[0])#label
+                sent_label.append(lsp[1])#sent
                 #
-                data.append(sent)
+                if(max_seq_length<len(lsp[1])):
+                    max_seq_length=len(lsp[1])
+                #
+                data.append(sent_label)
     #
-    return data
+    return data,max_seq_length
 
 def word2Id_id2Word(data,w2Id_save_fileName,i2Wd_save_fileName):
     '''
@@ -52,6 +58,10 @@ def word2Id_id2Word(data,w2Id_save_fileName,i2Wd_save_fileName):
     #
     w2Id={}
     i2Wd={}
+    #
+    w2Id['PAD']=0
+    i2Wd[0]='PAD'
+    #
     for l_s in data:
         for wd in l_s[1]:
             if(wd in w2Id):
@@ -102,6 +112,52 @@ def sent2Id(sent_label,w2id):
     #
     return sent2id,label
 
+def pad_sent(seq,max_length):
+    '''
+    每一块Batch数据进行Pading！
+    '''
+    seq+=[PAD_token for i in range(max_length-len(seq))]
+    return seq
+
+def batch_yeild(sent_labels,batch_size,max_seq_length,wd2id):
+    '''
+    每一个batch记得要PAD一下！
+    维度要求：B*seqLen
+    '''
+    random.shuffle(sent_labels)
+    seq_batch = []
+    label_batch=[]
+    for sent_label in sent_labels:
+        #
+        seq_batch.append([wd2id[wd] for wd in sent_label[1]])
+        label_batch.append([int(sent_label[0])])
+        #
+        if len(seq_batch) == batch_size:
+            #Padding
+            source_batch_pad=[pad_sent(s,max_seq_length) for s in seq_batch]
+            #Variable
+            if torch.cuda.is_available():
+                seq_batch_pad=Variable(torch.LongTensor(source_batch_pad)).cuda()
+                label_batch=Variable(torch.LongTensor(label_batch)).cuda()
+            else:
+                seq_batch_pad=Variable(torch.LongTensor(source_batch_pad))
+                label_batch=Variable(torch.LongTensor(label_batch))
+            #
+            yield seq_batch_pad,label_batch
+            seq_batch, label_batch = [], []
+    if len(seq_batch) != 0:
+        # Padding
+        source_batch_pad = [pad_sent(s, max_seq_length) for s in seq_batch]
+        # Variable
+        if torch.cuda.is_available():
+            seq_batch_pad = Variable(torch.LongTensor(source_batch_pad)).cuda()
+            label_batch = Variable(torch.LongTensor(label_batch)).cuda()
+        else:
+            seq_batch_pad = Variable(torch.LongTensor(source_batch_pad))
+            label_batch = Variable(torch.LongTensor(label_batch))
+        #
+        yield seq_batch_pad, label_batch
+
 def generate_one_sample(sent_label,w2id):
     '''
     Input sequence!
@@ -118,4 +174,3 @@ def generate_one_sample(sent_label,w2id):
         seq_output=seq_output.cuda()
     #
     return seq_input, seq_output
-

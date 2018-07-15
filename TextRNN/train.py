@@ -35,6 +35,8 @@ def train_one_epoch(epoch_num,model,optimizer,data_train,batch_size,w2id):
                 real_out=real_out.cuda()
             output, hidden = model(input)
             #
+            print(output)
+            print(real_out)
             batch_loss += criterion(output,real_out)
             #
             counts += 1

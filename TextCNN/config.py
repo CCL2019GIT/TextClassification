@@ -12,7 +12,7 @@ class Config:
     Config for this project!
     '''
     def __init__(self,class_nums,vocab_size,embed_dim,hidden_dim,droup_out_prob,
-                 droup_out_use,inChannels,num_filters,filter_size,epoch_nums,is_droupOut):
+                 num_filters,filter_size,epoch_nums,droup_out_use):
         '''
         Base information!
         '''
@@ -22,9 +22,8 @@ class Config:
         self.embed_dim = embed_dim
         self.hidden_dim = hidden_dim
         self.droup_out_prob = droup_out_prob
-        self.inChannels = inChannels
         self.num_filters = num_filters
         self.filter_size = filter_size
         #
         self.epoch_nums = epoch_nums
-        self.is_droupOut=is_droupOut
+        self.droup_out_use=droup_out_use
